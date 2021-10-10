@@ -5,15 +5,14 @@
       <div><strong>Description:</strong> {{ post.body }}</div>
     </div>
     <div class="post_btns">
-      <Button>Delete</Button>
+      <Button @click="$emit('remove', post)">Delete</Button>
     </div>
   </div>
 </template>
 
 <script>
-import Button from "./UI/Button";
+
 export default {
-  components: {Button},
   props: {
   post: {
     type: Object,
