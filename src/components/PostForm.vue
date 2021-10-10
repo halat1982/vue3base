@@ -3,12 +3,16 @@
     <h4>Add post</h4>
     <input v-model="post.title" class="input" type="text" placeholder="Title">
     <input v-model="post.body" class="input" type="text" placeholder="Description">
-    <button @click="createPost" class="btn">Add post</button>
+    <Button  @click="createPost" style="align-self: flex-end;">Create post</Button>
   </form>
 </template>
 
 <script>
+import Button from "./UI/Button";
 export default {
+  components: {
+    Button
+  },
   data(){
     return {
       post: {
@@ -44,14 +48,5 @@ form {
   flex-direction: column;
 }
 
-.btn {
-  align-self: flex-end;
-  margin-top: 15px;
-  padding: 10px 15px;
-  background: none;
-  color: teal;
-  border: 1px solid teal;
-  cursor: pointer;
 
-}
 </style>
