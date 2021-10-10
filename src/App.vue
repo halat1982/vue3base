@@ -1,7 +1,14 @@
 	<template>
 	<div class="app">
-  <post-form @create="createPost"/>
-  <post-list @remove="removePost" v-bind:posts="posts"/>
+    <h2>Push the button for create post</h2>
+    <Button @click="showDialog" style="margin:15px 0;">
+      Create Post
+    </Button>
+    <dialog-form v-model:show="dialogVisible">
+      <post-form @create="createPost"/>
+    </dialog-form>
+  <post-list @remove="removePost" v-bind:posts="posts" v-if="!isPostLoading"/>
+    <div v-if="isPostLoading">Waiting....</div>
   </div>
 
 	</template>
@@ -9,27 +16,47 @@
 	<script>
   import PostForm from "./components/PostForm";
   import PostList from "./components/PostList";
+  import DialogForm from "./components/UI/DialogForm";
+  import Button from "./components/UI/Button";
+  import axios from 'axios';
 	export default {
     components: {
+      Button,
+      DialogForm,
       PostList, PostForm
     },
     data(){
       return {
-        posts: [
-          {id:1, title:"Post 1", body:"Post 1 description"},
-          {id:2, title:"Post 2", body:"Post 2 description"},
-          {id:3, title:"Post 4", body:"Post 3 description"},
-          {id:4, title:"Post 4", body:"Post 4 description"},
-        ],
+        posts: [],
+        dialogVisible: false,
+        isPostLoading: false
       }
     },
     methods: {
       createPost(post){
         this.posts.push(post);
+        this.dialogVisible = false;
       },
       removePost(post){
         this.posts = this.posts.filter(p => p.id !== post.id)
+      },
+      showDialog(){
+        this.dialogVisible = true;
+      },
+      async fetchPosts() {
+        try {
+          this.isPostLoading = true;
+          const response =  await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+          this.posts = response.data;
+        } catch(e) {
+          alert("Something wrong with request or with response");
+        } finally {
+          this.isPostLoading = false;
+        }
       }
+    },
+    mounted() {
+      this.fetchPosts();
     }
   }
 	</script>
