@@ -1,9 +1,15 @@
 	<template>
 	<div class="app">
     <h2>Push the button for create post</h2>
-    <Button @click="showDialog" style="margin:15px 0;">
-      Create Post
-    </Button>
+    <div class="app__btns">
+      <Button @click="showDialog" >
+        Create Post
+      </Button>
+      <form-select
+        v-model="selectedSort"
+        :options="sortOptions"
+      />
+    </div>
     <dialog-form v-model:show="dialogVisible">
       <post-form @create="createPost"/>
     </dialog-form>
@@ -19,6 +25,7 @@
   import DialogForm from "./components/UI/DialogForm";
   import Button from "./components/UI/Button";
   import axios from 'axios';
+
 	export default {
     components: {
       Button,
@@ -29,7 +36,12 @@
       return {
         posts: [],
         dialogVisible: false,
-        isPostLoading: false
+        isPostLoading: false,
+        selectedSort: '',
+        sortOptions: [
+          {value: "title", name: "Name"},
+          {value: "body", name: "Description"}
+        ]
       }
     },
     methods: {
@@ -57,6 +69,13 @@
     },
     mounted() {
       this.fetchPosts();
+    },
+    watch: {
+      selectedSort(newValue){
+        this.posts.sort( (post1, post2) => {
+              return post1[newValue]?.localeCompare(post2[newValue]);
+            })
+      }
     }
   }
 	</script>
@@ -72,5 +91,12 @@
     padding: 20px;
   }
 
+  .app__btns {
+    margin:15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+  }
 
   </style>
