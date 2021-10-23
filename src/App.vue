@@ -1,6 +1,12 @@
 	<template>
 	<div class="app">
     <h2>Push the button for create post</h2>
+    <form-input
+    v-model="searchQuery"
+    placeholder="type search string..."
+    />
+
+
     <div class="app__btns">
       <Button @click="showDialog" >
         Create Post
@@ -13,8 +19,17 @@
     <dialog-form v-model:show="dialogVisible">
       <post-form @create="createPost"/>
     </dialog-form>
-  <post-list @remove="removePost" v-bind:posts="posts" v-if="!isPostLoading"/>
+  <post-list @remove="removePost" :posts="sortedAndSearchedPosts" v-if="!isPostLoading"/>
     <div v-if="isPostLoading">Waiting....</div>
+    <div class="page__wrapper">
+      <div
+          v-bind:key="pageNumber"
+          v-for="pageNumber in totalPages"
+          class="bread_item"
+          :class="{current_bread_item: page === pageNumber}"
+          @click="changePage(pageNumber)"
+      >{{pageNumber}}</div>
+    </div>
   </div>
 
 	</template>
@@ -25,9 +40,11 @@
   import DialogForm from "./components/UI/DialogForm";
   import Button from "./components/UI/Button";
   import axios from 'axios';
+  import FormInput from "./components/UI/FormInput";
 
 	export default {
     components: {
+      FormInput,
       Button,
       DialogForm,
       PostList, PostForm
@@ -41,7 +58,11 @@
         sortOptions: [
           {value: "title", name: "Name"},
           {value: "body", name: "Description"}
-        ]
+        ],
+        searchQuery: '',
+        page: 1,
+        limit: 10,
+        totalPages: 0
       }
     },
     methods: {
@@ -58,23 +79,44 @@
       async fetchPosts() {
         try {
           this.isPostLoading = true;
-          const response =  await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+          const response =  await axios.get('https://jsonplaceholder.typicode.com/posts?_limit', {
+            params:{
+              _page: this.page,
+              _limit: this.limit
+            }
+          });
+          this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit);
           this.posts = response.data;
         } catch(e) {
           alert("Something wrong with request or with response");
         } finally {
           this.isPostLoading = false;
         }
+      },
+      changePage(pageNumber){
+        this.page = pageNumber;
       }
     },
     mounted() {
       this.fetchPosts();
     },
+    computed: {
+      sortedPosts() {
+        return [...this.posts].sort((post1, post2) => post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]));
+
+      },
+      sortedAndSearchedPosts() {
+        return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      }
+    },
     watch: {
-      selectedSort(newValue){
+      /*selectedSort(newValue){
         this.posts.sort( (post1, post2) => {
               return post1[newValue]?.localeCompare(post2[newValue]);
             })
+      }*/
+      page(){
+        this.fetchPosts();
       }
     }
   }
@@ -99,4 +141,18 @@
 
   }
 
+  .bread_item {
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 0 3px;
+    cursor: pointer;
+  }
+  .current_bread_item {
+    border: 2px solid teal;
+  }
+
+  .page__wrapper {
+    display: flex;
+    margin-top: 15px;
+  }
   </style>
