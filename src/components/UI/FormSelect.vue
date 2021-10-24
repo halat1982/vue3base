@@ -1,6 +1,6 @@
 <template>
     <select  @change="changeOption" class="form-select">
-      <option value="" >Select item from list</option>
+      <option :value="selectedSort" >Select item from list</option>
       <option v-for="option in options" :key="option.value" :value="option.value">
         {{option.name}}
       </option>
@@ -35,6 +35,4 @@ export default {
   color: teal;
   border: 2px solid teal;
 }
-
-
 </style>

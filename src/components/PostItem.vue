@@ -1,10 +1,12 @@
 <template>
   <div class="post">
     <div>
+      <div>{{post.id}}</div>
       <div><strong>Name:</strong> {{ post.title }}</div>
       <div><strong>Description:</strong> {{ post.body }}</div>
     </div>
     <div class="post_btns">
+      <Button @click="$router.push(`/posts/${post.id}`)">Link</Button>   <!--апостроф здесь-->
       <Button @click="$emit('remove', post)">Delete</Button>
     </div>
   </div>
