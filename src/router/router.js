@@ -3,6 +3,7 @@ import Main from "../pages/Main";
 import PostPages from "../pages/PostPages";
 import About from "../pages/About";
 import Post from "../pages/Post";
+import PostPageWithStore from "../pages/PostPageWithStore";
 
 const routes = [
     {
@@ -24,7 +25,12 @@ const routes = [
         path: "/posts/:id",
         name: "post",
         component: Post
-    }
+    },
+    {
+        path: "/store",
+        name: "post",
+        component: PostPageWithStore
+    },
 ]
 
 const router = createRouter(
